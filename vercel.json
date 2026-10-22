@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/b/:slug",
+      "destination": "/boutique.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/espace.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    }
+  ]
+}
