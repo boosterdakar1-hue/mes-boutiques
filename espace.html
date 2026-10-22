@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mon espace | MaBoutique.sn</title>
+<meta name="theme-color" content="#F5F7F4">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+  // ==== À REMPLIR (Supabase > Project Settings > API) ====
+  const SUPABASE_URL = "https://jvckgtidqjowyorgnwll.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_oHnlzqQhVXh58fXNlvJw3A_hXQHkW0K";
+</script>
+<style>
+:root{
+  --encre:#0F2A22; --baobab:#12503C; --baobab-2:#1C6B51; --mangue:#F4B23E;
+  --papier:#F5F7F4; --blanc:#fff; --gris:#56665F; --ligne:#E1E6E0; --rouge:#C0392B;
+  --r-xl:32px; --r-l:24px; --r-m:16px; --r-s:12px;
+  --ombre:0 1px 2px rgba(15,42,34,.05),0 18px 40px -20px rgba(15,42,34,.28);
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --texte:'DM Sans',system-ui,sans-serif;
+  --c:#12503C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--texte);color:var(--encre);background:var(--papier);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100svh;padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:3px solid var(--mangue);outline-offset:3px;border-radius:10px}
+h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.025em;line-height:1.05}
+.wrap{width:min(1080px,100% - 32px);margin-inline:auto}
+[hidden]{display:none!important}
+
+/* Barre du haut */
+.haut{position:sticky;top:0;z-index:20;background:rgba(245,247,244,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ligne);padding-top:env(safe-area-inset-top,0px)}
+.haut .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font:800 19px/1 var(--display);letter-spacing:-.02em}
+.logo small{font:500 14px/1 var(--display);opacity:.6}
+.logo-marque{width:32px;height:32px;border-radius:10px;background:var(--mangue);display:grid;place-items:center}
+.lien-discret{font-weight:500;color:var(--gris);padding:8px 12px;border-radius:999px}
+.lien-discret:hover{color:var(--encre);background:var(--blanc)}
+
+/* Boutons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;font-weight:700;font-size:16px;transition:transform .15s ease,background .2s ease,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.6;pointer-events:none}
+.btn-vert{background:var(--baobab);color:#fff}
+.btn-vert:hover{background:var(--baobab-2)}
+.btn-mangue{background:var(--mangue);color:var(--encre)}
+.btn-blanc{background:var(--blanc);color:var(--encre);box-shadow:inset 0 0 0 1.5px var(--ligne)}
+.btn-blanc:hover{box-shadow:inset 0 0 0 1.5px var(--encre)}
+.btn-plein{width:100%}
+.btn-petit{min-height:42px;padding:0 16px;font-size:15px}
+
+/* Champs */
+.champ{display:grid;gap:8px}
+.champ label,.etiquette{font-weight:700;font-size:15px}
+.champ .aide{font-size:14px;color:var(--gris)}
+.saisie{width:100%;min-height:54px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--ligne);background:var(--blanc);font:500 16px/1.4 var(--texte);color:var(--encre);transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+textarea.saisie{min-height:96px;resize:vertical}
+.saisie:focus{outline:none;border-color:var(--baobab);box-shadow:0 0 0 4px rgba(18,80,60,.12)}
+.prefixe{display:flex;align-items:stretch;border:1.5px solid var(--ligne);border-radius:14px;background:var(--blanc);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.prefixe:focus-within{border-color:var(--baobab);box-shadow:0 0 0 4px rgba(18,80,60,.12)}
+.prefixe span{display:flex;align-items:center;padding:0 4px 0 16px;color:var(--gris);font-weight:500;white-space:nowrap}
+.prefixe .saisie{border:0;box-shadow:none;padding-left:4px;min-width:0}
+.erreur{background:#FCEDEB;color:#8E2A1F;border-radius:12px;padding:12px 14px;font-size:15px}
+.succes{background:#E7F4EE;color:#0E4A37;border-radius:12px;padding:12px 14px;font-size:15px}
+.grille-champs{display:grid;gap:22px}
+
+/* Chargement */
+.chargement{display:grid;place-items:center;min-height:60svh}
+.rond{width:38px;height:38px;border-radius:50%;border:3px solid var(--ligne);border-top-color:var(--baobab);animation:tourne .8s linear infinite}
+@keyframes tourne{to{transform:rotate(360deg)}}
+
+/* Vues */
+.vue{padding:28px 0 64px;animation:entre .45s cubic-bezier(.2,.7,.2,1)}
+@keyframes entre{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* Connexion */
+.auth{display:grid;background:var(--blanc);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--ombre);max-width:980px;margin-inline:auto}
+@media (min-width:860px){.auth{grid-template-columns:1fr 1fr}}
+.auth-photo{position:relative;min-height:220px}
+.auth-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.auth-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(15,42,34,.85))}
+.auth-photo p{position:absolute;left:28px;right:28px;bottom:26px;z-index:1;color:#fff;font:800 clamp(26px,3.2vw,36px)/1.05 var(--display);letter-spacing:-.025em}
+.auth-corps{padding:clamp(28px,5vw,52px)}
+.onglets{display:grid;grid-template-columns:1fr 1fr;background:var(--papier);border-radius:999px;padding:5px;margin-bottom:30px}
+.onglet{min-height:46px;border-radius:999px;font-weight:700;color:var(--gris);transition:background .2s,color .2s}
+.onglet[aria-selected="true"]{background:var(--blanc);color:var(--encre);box-shadow:0 2px 8px rgba(15,42,34,.08)}
+.auth h1{font-size:clamp(30px,4vw,40px);margin-bottom:8px}
+.auth .sous{color:var(--gris);margin-bottom:26px}
+.oubli{font-size:15px;color:var(--gris);text-decoration:underline;text-underline-offset:3px;justify-self:start}
+
+/* Formulaire boutique */
+.creer{display:grid;gap:32px;align-items:start}
+@media (min-width:900px){.creer{grid-template-columns:1.1fr .9fr}}
+.creer h1{font-size:clamp(34px,5vw,52px)}
+.creer .sous{color:var(--gris);margin:12px 0 30px;max-width:46ch}
+.carte{background:var(--blanc);border-radius:var(--r-l);box-shadow:var(--ombre);padding:clamp(22px,4vw,34px)}
+.nuancier{display:flex;flex-wrap:wrap;gap:10px}
+.teinte{width:42px;height:42px;border-radius:50%;background:var(--t);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);transition:transform .15s}
+.teinte[aria-pressed="true"]{box-shadow:0 0 0 3px var(--blanc),0 0 0 5px var(--t)}
+.teinte-perso{position:relative;overflow:hidden;background:conic-gradient(#e53935,#fb8c00,#fdd835,#43a047,#1e88e5,#8e24aa,#e53935)}
+.teinte-perso input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.depot{position:relative;display:grid;place-items:center;text-align:center;gap:6px;min-height:150px;border:2px dashed var(--ligne);border-radius:var(--r-m);padding:20px;color:var(--gris);cursor:pointer;overflow:hidden;background:var(--papier);transition:border-color .2s}
+.depot:hover{border-color:var(--baobab)}
+.depot b{color:var(--encre)}
+.depot input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.depot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.depot.rempli{border-style:solid;border-color:transparent}
+.depot.rempli .depot-texte{display:none}
+.apercu-titre{font-weight:700;font-size:15px;color:var(--gris);margin-bottom:12px}
+.apercu{border-radius:var(--r-l);overflow:hidden;background:var(--blanc);box-shadow:var(--ombre);position:sticky;top:96px}
+.apercu-banniere{height:190px;background:#ccc center/cover;position:relative}
+.apercu-banniere::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.6))}
+.apercu-banniere h2{position:absolute;left:20px;right:20px;bottom:16px;z-index:1;color:#fff;font-size:30px;overflow-wrap:anywhere}
+.apercu-corps{padding:18px 20px 22px;display:grid;gap:14px}
+.apercu-produits{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.apercu-produits div{aspect-ratio:1;border-radius:14px;background:var(--papier)}
+.apercu-bouton{min-height:46px;border-radius:999px;background:var(--c);color:var(--c-texte,#fff);display:grid;place-items:center;font-weight:700}
+.apercu-adresse{font-size:14px;color:var(--gris);overflow-wrap:anywhere}
+
+/* Tableau de bord */
+.entete{display:grid;background:var(--blanc);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--ombre)}
+@media (min-width:860px){.entete{grid-template-columns:340px 1fr}}
+.entete-photo{min-height:170px;background:#ccc center/cover;position:relative}
+.entete-photo::after{content:"";position:absolute;inset:auto 0 0;height:6px;background:var(--c)}
+@media (min-width:860px){.entete-photo::after{inset:0 0 0 auto;width:6px;height:auto}}
+.entete-corps{padding:clamp(22px,4vw,34px);display:grid;gap:14px}
+.entete h1{font-size:clamp(30px,5vw,44px);overflow-wrap:anywhere}
+.statut{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;padding:6px 12px;border-radius:999px;background:#FFF4DC;color:#7A5300;justify-self:start}
+.statut.ok{background:#E7F4EE;color:#0E4A37}
+.statut.pause{background:#FCEDEB;color:#8E2A1F}
+.lien-boite{display:flex;align-items:center;gap:8px;background:var(--papier);border-radius:14px;padding:6px 6px 6px 16px}
+.lien-boite span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+@media (max-width:520px){.actions .btn{flex:1 1 calc(50% - 5px);padding:0 12px}}
+.titre-section{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:44px 0 18px}
+.titre-section h2{font-size:clamp(26px,4vw,34px)}
+.titre-section h2 small{font:500 18px var(--texte);color:var(--gris);letter-spacing:0}
+.produits{list-style:none;display:grid;gap:12px}
+@media (min-width:900px){.produits{grid-template-columns:1fr 1fr}}
+.prod{background:var(--blanc);border-radius:var(--r-m);box-shadow:var(--ombre);padding:12px;display:grid;grid-template-columns:84px 1fr auto;grid-template-areas:"photo info suppr" "photo stock stock";column-gap:14px;row-gap:6px;align-items:center}
+.prod-photo{grid-area:photo;width:84px;height:84px;border-radius:14px;overflow:hidden;background:var(--papier);align-self:start}
+.prod-photo img{width:100%;height:100%;object-fit:cover}
+.prod-info{grid-area:info;min-width:0}
+.prod-nom{display:block;font-weight:700;text-align:left;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prix-champ{display:inline-flex;align-items:center;gap:6px;margin-top:4px;background:var(--papier);border-radius:10px;padding:0 10px;border:1.5px solid transparent;transition:border-color .2s}
+.prix-champ:focus-within{border-color:var(--baobab);background:var(--blanc)}
+.prix-champ input{width:9ch;border:0;background:transparent;font:700 16px/1 var(--texte);color:var(--encre);padding:9px 0;outline:none}
+.prix-champ span{color:var(--gris);font-size:14px}
+.prix-champ.enregistre{border-color:#2E8B57}
+.prod-suppr{grid-area:suppr;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;color:var(--gris);align-self:start}
+.prod-suppr:hover{background:#FCEDEB;color:var(--rouge)}
+.interrupteur{grid-area:stock;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:var(--gris);cursor:pointer;justify-self:start}
+.interrupteur input{position:absolute;opacity:0;width:1px;height:1px}
+.interrupteur i{width:44px;height:26px;border-radius:999px;background:#CDD5CF;position:relative;transition:background .2s;flex:none}
+.interrupteur i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s}
+.interrupteur input:checked+i{background:#2E8B57}
+.interrupteur input:checked+i::after{transform:translateX(18px)}
+.interrupteur input:focus-visible+i{outline:3px solid var(--mangue);outline-offset:2px}
+.vide{background:var(--blanc);border-radius:var(--r-l);box-shadow:var(--ombre);padding:44px 24px;text-align:center;display:grid;gap:12px;justify-items:center}
+.vide h3{font-size:24px}
+.vide p{color:var(--gris);max-width:36ch}
+
+/* Fenêtre produit */
+.voile{position:fixed;inset:0;z-index:40;background:rgba(15,42,34,.45);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .25s}
+.voile.ouvert{opacity:1}
+.fenetre{background:var(--blanc);width:100%;max-width:560px;max-height:92svh;overflow:auto;border-radius:28px 28px 0 0;padding:26px 22px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(40px);transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.voile.ouvert .fenetre{transform:none}
+@media (min-width:640px){.voile{align-items:center}.fenetre{border-radius:28px;padding:32px}}
+.fenetre-tete{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.fenetre-tete h2{font-size:28px}
+.fermer{width:42px;height:42px;border-radius:50%;background:var(--papier);display:grid;place-items:center}
+.fenetre .depot{min-height:220px}
+
+/* Message bref */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);opacity:0;z-index:60;background:var(--encre);color:#fff;padding:14px 22px;border-radius:999px;font-weight:500;box-shadow:0 12px 30px rgba(0,0,0,.25);transition:opacity .25s,transform .25s;max-width:calc(100% - 32px);text-align:center}
+.toast.visible{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<header class="haut">
+  <div class="wrap">
+    <a href="/" class="logo"><span class="logo-marque"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0F2A22" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span>MaBoutique<small>.sn</small></a>
+    <button class="lien-discret" id="btn-deconnexion" hidden>Se déconnecter</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="chargement" id="vue-chargement"><div class="rond" aria-label="Chargement"></div></div>
+
+  <!-- Connexion / inscription -->
+  <section class="vue" id="vue-auth" hidden>
+    <div class="auth">
+      <div class="auth-photo">
+        <img src="https://images.unsplash.com/photo-1585540083814-ea6ee8af9e4f?auto=format&fit=crop&w=1200&q=80" alt="Une commerçante à son étal au marché">
+        <p>Votre boutique en ligne en 5 minutes</p>
+      </div>
+      <div class="auth-corps">
+        <div class="onglets" role="tablist">
+          <button class="onglet" role="tab" id="onglet-inscription" aria-selected="true">Créer un compte</button>
+          <button class="onglet" role="tab" id="onglet-connexion" aria-selected="false">Se connecter</button>
+        </div>
+        <h1 id="auth-titre">Ouvrez votre boutique</h1>
+        <p class="sous" id="auth-sous">14 jours gratuits, sans carte bancaire.</p>
+        <form id="form-auth" class="grille-champs" novalidate>
+          <div class="champ"><label for="a-email">Adresse e-mail</label><input class="saisie" id="a-email" type="email" autocomplete="email" required></div>
+          <div class="champ"><label for="a-mdp">Mot de passe</label><input class="saisie" id="a-mdp" type="password" autocomplete="new-password" minlength="6" required><span class="aide" id="aide-mdp">6 caractères minimum</span></div>
+          <div class="erreur" id="auth-erreur" hidden></div>
+          <div class="succes" id="auth-succes" hidden></div>
+          <button class="btn btn-vert btn-plein" id="btn-auth" type="submit">Créer mon compte</button>
+          <button class="oubli" type="button" id="btn-oubli" hidden>Mot de passe oublié ?</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nouveau mot de passe -->
+  <section class="vue" id="vue-recup" hidden>
+    <div class="carte" style="max-width:520px;margin-inline:auto">
+      <h1 style="font-size:34px;margin-bottom:22px">Choisissez un nouveau mot de passe</h1>
+      <form id="form-recup" class="grille-champs">
+        <div class="champ"><label for="r-mdp">Nouveau mot de passe</label><input class="saisie" id="r-mdp" type="password" minlength="6" autocomplete="new-password" required></div>
+        <div class="erreur" id="recup-erreur" hidden></div>
+        <button class="btn btn-vert btn-plein" type="submit">Enregistrer le mot de passe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Création / modification de la boutique -->
+  <section class="vue" id="vue-boutique" hidden>
+    <div class="creer">
+      <div>
+        <button class="lien-discret" id="btn-retour" type="button" hidden style="margin:-8px 0 14px -12px">Retour à mes produits</button>
+        <h1 id="b-titre">Créez votre boutique</h1>
+        <p class="sous" id="b-sous">Ces informations s'affichent pour vos clients. Vous pourrez tout modifier plus tard.</p>
+        <form id="form-boutique" class="carte grille-champs" novalidate>
+          <div class="champ"><label for="b-nom">Nom de la boutique</label><input class="saisie" id="b-nom" maxlength="60" placeholder="Fatou Tissus" required></div>
+          <div class="champ"><label for="b-slug">Adresse de votre boutique</label>
+            <div class="prefixe"><span>maboutique.sn/b/</span><input class="saisie" id="b-slug" maxlength="40" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="fatou-tissus" required></div>
+            <span class="aide">Lettres minuscules, chiffres et tirets.</span></div>
+          <div class="champ"><label for="b-whatsapp">Numéro WhatsApp qui reçoit les commandes</label>
+            <div class="prefixe"><span>+221</span><input class="saisie" id="b-whatsapp" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="77 123 45 67" required></div></div>
+          <div class="champ"><label for="b-paiement">Numéro Wave ou Orange Money pour être payé</label>
+            <div class="prefixe"><span>+221</span><input class="saisie" id="b-paiement" type="tel" inputmode="numeric" placeholder="77 123 45 67" required></div></div>
+          <div class="champ"><span class="etiquette">Couleur de la boutique</span>
+            <div class="nuancier" id="nuancier"></div></div>
+          <div class="champ"><span class="etiquette">Photo de bannière</span>
+            <label class="depot" id="depot-banniere">
+              <input type="file" accept="image/*" id="b-banniere">
+              <img id="b-banniere-img" alt="" hidden>
+              <span class="depot-texte"><b>Ajouter une photo</b><br>Votre vitrine, vos produits ou votre équipe</span>
+            </label></div>
+          <div class="erreur" id="b-erreur" hidden></div>
+          <button class="btn btn-vert btn-plein" id="btn-boutique" type="submit">Créer ma boutique</button>
+        </form>
+      </div>
+      <aside>
+        <p class="apercu-titre">Aperçu pour vos clients</p>
+        <div class="apercu">
+          <div class="apercu-banniere" id="ap-banniere"><h2 id="ap-nom">Ma boutique</h2></div>
+          <div class="apercu-corps">
+            <div class="apercu-produits"><div></div><div></div></div>
+            <div class="apercu-bouton">Commander sur WhatsApp</div>
+            <div class="apercu-adresse" id="ap-adresse">maboutique.sn/b/</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Tableau de bord -->
+  <section class="vue" id="vue-tableau" hidden>
+    <div class="entete">
+      <div class="entete-photo" id="t-photo"></div>
+      <div class="entete-corps">
+        <span class="statut" id="t-statut"></span>
+        <h1 id="t-nom"></h1>
+        <div class="lien-boite"><span id="t-lien"></span><button class="btn btn-vert btn-petit" id="btn-copier">Copier le lien</button></div>
+        <div class="actions">
+          <a class="btn btn-blanc btn-petit" id="btn-voir" target="_blank" rel="noopener">Voir ma boutique</a>
+          <a class="btn btn-blanc btn-petit" id="btn-partager" target="_blank" rel="noopener">Partager sur WhatsApp</a>
+          <button class="btn btn-blanc btn-petit" id="btn-modifier">Modifier ma boutique</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="titre-section">
+      <h2>Mes produits <small id="t-compte"></small></h2>
+      <button class="btn btn-mangue btn-petit" id="btn-ajouter">Ajouter un produit</button>
+    </div>
+    <ul class="produits" id="liste-produits"></ul>
+    <div class="vide" id="produits-vide" hidden>
+      <h3>Ajoutez votre premier produit</h3>
+      <p>Une photo, un nom et un prix suffisent. Vos clients le verront tout de suite.</p>
+      <button class="btn btn-vert" id="btn-ajouter-2">Ajouter un produit</button>
+    </div>
+  </section>
+</main>
+
+<!-- Fenêtre ajout / modification de produit -->
+<div class="voile" id="voile-produit" hidden>
+  <div class="fenetre" role="dialog" aria-modal="true" aria-labelledby="p-titre">
+    <div class="fenetre-tete"><h2 id="p-titre">Nouveau produit</h2><button class="fermer" id="btn-fermer" aria-label="Fermer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <form id="form-produit" class="grille-champs" novalidate>
+      <label class="depot" id="depot-produit">
+        <input type="file" accept="image/*" id="p-photo">
+        <img id="p-photo-img" alt="" hidden>
+        <span class="depot-texte"><b>Prendre ou choisir une photo</b><br>Une photo nette, sur un fond simple</span>
+      </label>
+      <div class="champ"><label for="p-nom">Nom du produit</label><input class="saisie" id="p-nom" maxlength="80" placeholder="Wax hollandais 6 yards" required></div>
+      <div class="champ"><label for="p-desc">Description <span style="font-weight:500;color:var(--gris)">(facultatif)</span></label><textarea class="saisie" id="p-desc" maxlength="500" placeholder="Taille, couleur, matière…"></textarea></div>
+      <div class="champ"><label for="p-prix">Prix</label><div class="prefixe"><input class="saisie" id="p-prix" inputmode="numeric" placeholder="15 000" required style="padding-left:16px"><span style="padding:0 16px 0 4px">F CFA</span></div></div>
+      <div class="erreur" id="p-erreur" hidden></div>
+      <button class="btn btn-vert btn-plein" id="btn-produit" type="submit">Ajouter le produit</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const estRecuperation = location.hash.includes('type=recovery');
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const BANNIERE_DEFAUT = "https://images.unsplash.com/photo-1768212565426-58b089b6386d?auto=format&fit=crop&w=1400&q=80";
+const TEINTES = ['#12503C','#8E3B9A','#C2185B','#C4501E','#E09A1A','#1565C0','#00897B','#263238'];
+
+let utilisateur = null, boutique = null, produits = [];
+let modeAuth = 'inscription', modeBoutique = 'creation', produitEdite = null;
+let couleur = TEINTES[0], fichierBanniere = null, fichierProduit = null, slugManuel = false;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fcfa = n => Number(n || 0).toLocaleString('fr-FR').replace(/\u202f|\u00a0/g, ' ');
+const chiffres = s => String(s || '').replace(/\D/g, '');
+const slugifier = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  .replace(/&/g, ' et ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40).replace(/-+$/, '');
+const numeroLocal = s => { let d = chiffres(s); if (d.startsWith('00221')) d = d.slice(5); if (d.startsWith('221') && d.length === 12) d = d.slice(3); return d; };
+const joli = d => d.length === 9 ? d.replace(/(\d{2})(\d{3})(\d{2})(\d{2})/, '$1 $2 $3 $4') : d;
+const texteSur = hex => { const h = hex.replace('#',''); const [r,g,b] = [0,2,4].map(i => parseInt(h.substr(i,2),16)/255); return (0.299*r + 0.587*g + 0.114*b) > 0.62 ? '#0F2A22' : '#fff'; };
+
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('visible');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('visible'), 2600);
+}
+function afficher(nom) {
+  ['chargement','auth','recup','boutique','tableau'].forEach(v => $('vue-' + v).hidden = v !== nom);
+  $('btn-deconnexion').hidden = !utilisateur || nom === 'auth';
+  scrollTo(0, 0);
+}
+function montrerErreur(id, msg) { const e = $(id); e.textContent = msg; e.hidden = !msg; }
+function occupe(btn, oui, texte) { btn.disabled = oui; if (texte) btn.textContent = texte; }
+
+function traduire(err) {
+  const m = (err && err.message) || '';
+  if (/Invalid login credentials/i.test(m)) return "E-mail ou mot de passe incorrect.";
+  if (/already registered|already exists/i.test(m)) return "Un compte existe déjà avec cet e-mail. Utilisez l'onglet « Se connecter ».";
+  if (/Email not confirmed/i.test(m)) return "Confirmez d'abord votre adresse en cliquant sur le lien reçu par e-mail.";
+  if (/Password should be/i.test(m)) return "Le mot de passe doit contenir au moins 6 caractères.";
+  if (/rate limit|too many/i.test(m)) return "Trop d'essais. Patientez une minute puis réessayez.";
+  if (/Failed to fetch|NetworkError/i.test(m)) return "Pas de connexion internet. Vérifiez votre réseau puis réessayez.";
+  return "Une erreur est survenue : " + m;
+}
+
+/* ---------- Photos : compression puis envoi dans Supabase Storage ---------- */
+async function compresser(fichier, max = 1400) {
+  try {
+    const img = await createImageBitmap(fichier);
+    const r = Math.min(1, max / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return await new Promise(res => c.toBlob(b => res(b || fichier), 'image/jpeg', 0.82));
+  } catch { return fichier; }
+}
+async function envoyerPhoto(fichier, type) {
+  const blob = await compresser(fichier, type === 'banniere' ? 1800 : 1200);
+  const chemin = `${utilisateur.id}/${type}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.jpg`;
+  const { error } = await sb.storage.from('photos').upload(chemin, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+  if (error) throw error;
+  return sb.storage.from('photos').getPublicUrl(chemin).data.publicUrl;
+}
+async function supprimerPhoto(url) {
+  const i = (url || '').indexOf('/object/public/photos/');
+  if (i < 0) return;
+  await sb.storage.from('photos').remove([decodeURIComponent(url.slice(i + 22))]);
+}
+function brancherDepot(input, img, zone, quand) {
+  input.addEventListener('change', () => {
+    const f = input.files[0]; if (!f) return;
+    img.src = URL.createObjectURL(f); img.hidden = false; zone.classList.add('rempli');
+    quand(f);
+  });
+}
+
+/* ---------- Connexion ---------- */
+function choisirOnglet(mode) {
+  modeAuth = mode;
+  const insc = mode === 'inscription';
+  $('onglet-inscription').setAttribute('aria-selected', insc);
+  $('onglet-connexion').setAttribute('aria-selected', !insc);
+  $('auth-titre').textContent = insc ? 'Ouvrez votre boutique' : 'Bon retour parmi nous';
+  $('auth-sous').textContent = insc ? '14 jours gratuits, sans carte bancaire.' : 'Connectez-vous pour gérer vos produits.';
+  $('btn-auth').textContent = insc ? 'Créer mon compte' : 'Me connecter';
+  $('a-mdp').autocomplete = insc ? 'new-password' : 'current-password';
+  $('aide-mdp').hidden = !insc; $('btn-oubli').hidden = insc;
+  montrerErreur('auth-erreur', ''); $('auth-succes').hidden = true;
+}
+$('onglet-inscription').onclick = () => choisirOnglet('inscription');
+$('onglet-connexion').onclick = () => choisirOnglet('connexion');
+
+$('form-auth').addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = $('a-email').value.trim(), mdp = $('a-mdp').value;
+  montrerErreur('auth-erreur', ''); $('auth-succes').hidden = true;
+  if (!/^\S+@\S+\.\S+$/.test(email)) return montrerErreur('auth-erreur', "Entrez une adresse e-mail valide.");
+  if (mdp.length < 6) return montrerErreur('auth-erreur', "Le mot de passe doit contenir au moins 6 caractères.");
+  const btn = $('btn-auth'), texte = btn.textContent;
+  occupe(btn, true, 'Un instant…');
+  try {
+    if (modeAuth === 'inscription') {
+      const { data, error } = await sb.auth.signUp({ email, password: mdp, options: { emailRedirectTo: location.origin + '/espace.html' } });
+      if (error) throw error;
+      if (data.session) return entrer(data.user);
+      $('auth-succes').textContent = `Un e-mail de confirmation a été envoyé à ${email}. Ouvrez-le, cliquez sur le lien, et vous arriverez directement ici.`;
+      $('auth-succes').hidden = false;
+    } else {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: mdp });
+      if (error) throw error;
+      return entrer(data.user);
+    }
+  } catch (err) { montrerErreur('auth-erreur', traduire(err)); }
+  finally { occupe(btn, false, texte); }
+});
+
+$('btn-oubli').onclick = async () => {
+  const email = $('a-email').value.trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)) return montrerErreur('auth-erreur', "Entrez d'abord votre adresse e-mail ci-dessus.");
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/espace.html' });
+  if (error) return montrerErreur('auth-erreur', traduire(error));
+  $('auth-succes').textContent = `Un lien pour changer votre mot de passe a été envoyé à ${email}.`;
+  $('auth-succes').hidden = false;
+};
+
+$('form-recup').addEventListener('submit', async e => {
+  e.preventDefault();
+  const mdp = $('r-mdp').value;
+  if (mdp.length < 6) return montrerErreur('recup-erreur', "Le mot de passe doit contenir au moins 6 caractères.");
+  const { data, error } = await sb.auth.updateUser({ password: mdp });
+  if (error) return montrerErreur('recup-erreur', traduire(error));
+  history.replaceState(null, '', '/espace.html');
+  toast('Mot de passe enregistré'); entrer(data.user);
+});
+
+$('btn-deconnexion').onclick = async () => {
+  await sb.auth.signOut(); utilisateur = null; boutique = null; produits = [];
+  choisirOnglet('connexion'); afficher('auth');
+};
+
+/* ---------- Après connexion ---------- */
+async function entrer(user) {
+  utilisateur = user; afficher('chargement');
+  const { data, error } = await sb.from('boutiques').select('*').eq('proprietaire_id', user.id).limit(1).maybeSingle();
+  if (error) { toast(traduire(error)); afficher('auth'); return; }
+  boutique = data;
+  if (!boutique) ouvrirFormBoutique('creation'); else { await chargerProduits(); afficherTableau(); }
+}
+
+/* ---------- Formulaire boutique ---------- */
+function dessinerNuancier() {
+  const perso = !TEINTES.includes(couleur);
+  $('nuancier').innerHTML = TEINTES.map(t => `<button type="button" class="teinte" style="--t:${t}" data-teinte="${t}" aria-label="Couleur ${t}" aria-pressed="${t === couleur}"></button>`).join('')
+    + `<label class="teinte teinte-perso" style="--t:${perso ? couleur : '#999'}" aria-pressed="${perso}" title="Autre couleur"><input type="color" id="teinte-libre" value="${couleur}" aria-label="Choisir une autre couleur"></label>`;
+  $('teinte-libre').addEventListener('input', e => { couleur = e.target.value; majApercu(); });
+  $('teinte-libre').addEventListener('change', dessinerNuancier);
+}
+$('nuancier').addEventListener('click', e => {
+  const b = e.target.closest('[data-teinte]'); if (!b) return;
+  couleur = b.dataset.teinte; dessinerNuancier(); majApercu();
+});
+function majApercu() {
+  const nom = $('b-nom').value.trim() || 'Ma boutique';
+  $('ap-nom').textContent = nom;
+  $('ap-adresse').textContent = 'maboutique.sn/b/' + ($('b-slug').value || '');
+  const img = fichierBanniere ? URL.createObjectURL(fichierBanniere) : (boutique?.banniere_url || BANNIERE_DEFAUT);
+  $('ap-banniere').style.backgroundImage = `url("${img}")`;
+  document.documentElement.style.setProperty('--c', couleur);
+  document.documentElement.style.setProperty('--c-texte', texteSur(couleur));
+}
+$('b-nom').addEventListener('input', () => { if (!slugManuel) $('b-slug').value = slugifier($('b-nom').value); majApercu(); });
+$('b-slug').addEventListener('input', () => {
+  slugManuel = true;
+  $('b-slug').value = $('b-slug').value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+  majApercu();
+});
+$('b-slug').addEventListener('blur', () => { $('b-slug').value = slugifier($('b-slug').value); majApercu(); });
+brancherDepot($('b-banniere'), $('b-banniere-img'), $('depot-banniere'), f => { fichierBanniere = f; majApercu(); });
+
+function ouvrirFormBoutique(mode) {
+  modeBoutique = mode; fichierBanniere = null; $('b-banniere').value = '';
+  const edition = mode === 'edition';
+  $('b-titre').textContent = edition ? 'Modifier ma boutique' : 'Créez votre boutique';
+  $('b-sous').textContent = edition ? "Les changements sont visibles immédiatement par vos clients." : "Ces informations s'affichent pour vos clients. Vous pourrez tout modifier plus tard.";
+  $('btn-boutique').textContent = edition ? 'Enregistrer les changements' : 'Créer ma boutique';
+  $('btn-retour').hidden = !edition;
+  $('b-nom').value = edition ? boutique.nom : '';
+  $('b-slug').value = edition ? boutique.slug : '';
+  $('b-whatsapp').value = edition ? joli(numeroLocal(boutique.whatsapp)) : '';
+  $('b-paiement').value = edition ? joli(numeroLocal(boutique.numero_paiement)) : '';
+  slugManuel = edition;
+  couleur = (edition && boutique.couleur) || TEINTES[0];
+  const img = $('b-banniere-img');
+  if (edition && boutique.banniere_url) { img.src = boutique.banniere_url; img.hidden = false; $('depot-banniere').classList.add('rempli'); }
+  else { img.hidden = true; $('depot-banniere').classList.remove('rempli'); }
+  montrerErreur('b-erreur', '');
+  dessinerNuancier(); majApercu(); afficher('boutique');
+}
+$('btn-retour').onclick = () => afficherTableau();
+
+$('form-boutique').addEventListener('submit', async e => {
+  e.preventDefault(); montrerErreur('b-erreur', '');
+  const nom = $('b-nom').value.trim(), slug = slugifier($('b-slug').value);
+  const wa = numeroLocal($('b-whatsapp').value), pay = numeroLocal($('b-paiement').value);
+  if (nom.length < 2) return montrerErreur('b-erreur', "Donnez un nom à votre boutique.");
+  if (slug.length < 3) return montrerErreur('b-erreur', "L'adresse doit contenir au moins 3 caractères.");
+  if (!/^[37]\d{8}$/.test(wa)) return montrerErreur('b-erreur', "Le numéro WhatsApp doit avoir 9 chiffres, par exemple 77 123 45 67.");
+  if (!/^[37]\d{8}$/.test(pay)) return montrerErreur('b-erreur', "Le numéro Wave ou Orange Money doit avoir 9 chiffres, par exemple 77 123 45 67.");
+  const btn = $('btn-boutique'), texte = btn.textContent;
+  occupe(btn, true, 'Enregistrement…');
+  try {
+    let banniere_url = boutique?.banniere_url || null;
+    if (fichierBanniere) banniere_url = await envoyerPhoto(fichierBanniere, 'banniere');
+    const donnees = { nom, slug, whatsapp: '221' + wa, numero_paiement: pay, couleur, banniere_url };
+    let res;
+    if (modeBoutique === 'creation') res = await sb.from('boutiques').insert({ ...donnees, proprietaire_id: utilisateur.id }).select().single();
+    else res = await sb.from('boutiques').update(donnees).eq('id', boutique.id).select().single();
+    if (res.error) {
+      if (res.error.code === '23505') throw new Error(`L'adresse « ${slug} » est déjà prise. Essayez par exemple « ${slug}-dakar ».`);
+      throw res.error;
+    }
+    const ancienne = boutique?.banniere_url;
+    boutique = res.data;
+    if (fichierBanniere && ancienne && ancienne !== boutique.banniere_url) supprimerPhoto(ancienne);
+    if (modeBoutique === 'creation') { toast('Boutique créée'); produits = []; } else toast('Changements enregistrés');
+    afficherTableau();
+  } catch (err) { montrerErreur('b-erreur', err.code ? traduire(err) : err.message); }
+  finally { occupe(btn, false, texte); }
+});
+
+/* ---------- Tableau de bord ---------- */
+const lienBoutique = () => `${location.origin}/b/${boutique.slug}`;
+function afficherTableau() {
+  document.documentElement.style.setProperty('--c', boutique.couleur || TEINTES[0]);
+  $('t-nom').textContent = boutique.nom;
+  $('t-photo').style.backgroundImage = `url("${boutique.banniere_url || BANNIERE_DEFAUT}")`;
+  $('t-lien').textContent = lienBoutique().replace(/^https?:\/\//, '');
+  $('btn-voir').href = '/b/' + boutique.slug;
+  $('btn-partager').href = 'https://wa.me/?text=' + encodeURIComponent(`Découvrez ma boutique ${boutique.nom} et commandez directement ici : ${lienBoutique()}`);
+  const s = $('t-statut'); s.className = 'statut';
+  if (!boutique.active) { s.classList.add('pause'); s.textContent = 'Boutique en pause : invisible pour vos clients'; }
+  else if (boutique.formule === 'essai' && boutique.fin_essai) {
+    const jours = Math.ceil((new Date(boutique.fin_essai) - Date.now()) / 86400000);
+    s.textContent = jours > 0 ? `Essai gratuit : ${jours} jour${jours > 1 ? 's' : ''} restant${jours > 1 ? 's' : ''}` : "Essai terminé : choisissez votre formule pour continuer";
+  } else { s.classList.add('ok'); s.textContent = 'Formule ' + (boutique.formule || '').replace(/^./, c => c.toUpperCase()); }
+  dessinerProduits(); afficher('tableau');
+}
+$('btn-modifier').onclick = () => ouvrirFormBoutique('edition');
+$('btn-copier').onclick = async () => {
+  try { await navigator.clipboard.writeText(lienBoutique()); }
+  catch { const t = document.createElement('textarea'); t.value = lienBoutique(); document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
+  toast('Lien copié. Collez-le dans vos statuts !');
+};
+
+async function chargerProduits() {
+  const { data, error } = await sb.from('produits').select('*').eq('boutique_id', boutique.id).order('nom');
+  if (error) { toast(traduire(error)); produits = []; return; }
+  produits = data;
+}
+function dessinerProduits() {
+  $('t-compte').textContent = produits.length ? `(${produits.length})` : '';
+  $('produits-vide').hidden = produits.length > 0;
+  $('liste-produits').innerHTML = produits.map(p => `
+    <li class="prod" data-id="${p.id}">
+      <button class="prod-photo" data-action="editer" aria-label="Modifier ${esc(p.nom)}">${p.photo_url ? `<img src="${esc(p.photo_url)}" alt="" loading="lazy">` : ''}</button>
+      <div class="prod-info">
+        <button class="prod-nom" data-action="editer">${esc(p.nom)}</button>
+        <label class="prix-champ"><input data-action="prix" inputmode="numeric" value="${fcfa(p.prix_fcfa)}" aria-label="Prix de ${esc(p.nom)}"><span>F CFA</span></label>
+      </div>
+      <button class="prod-suppr" data-action="supprimer" aria-label="Supprimer ${esc(p.nom)}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+      <label class="interrupteur"><input type="checkbox" data-action="stock" ${p.en_stock ? 'checked' : ''}><i></i><span>${p.en_stock ? 'En stock' : 'Épuisé'}</span></label>
+    </li>`).join('');
+}
+const trouver = el => { const li = el.closest('.prod'); return li && produits.find(p => String(p.id) === li.dataset.id); };
+
+$('liste-produits').addEventListener('click', async e => {
+  const b = e.target.closest('[data-action]'); if (!b) return;
+  const p = trouver(b); if (!p) return;
+  if (b.dataset.action === 'editer') ouvrirProduit(p);
+  if (b.dataset.action === 'supprimer') {
+    if (!confirm(`Supprimer « ${p.nom} » ? Cette action est définitive.`)) return;
+    const { error } = await sb.from('produits').delete().eq('id', p.id);
+    if (error) return toast(traduire(error));
+    supprimerPhoto(p.photo_url);
+    produits = produits.filter(x => x.id !== p.id); dessinerProduits(); toast('Produit supprimé');
+  }
+});
+$('liste-produits').addEventListener('change', async e => {
+  const el = e.target, p = trouver(el); if (!p) return;
+  if (el.dataset.action === 'stock') {
+    const val = el.checked; el.nextElementSibling.nextElementSibling.textContent = val ? 'En stock' : 'Épuisé';
+    const { error } = await sb.from('produits').update({ en_stock: val }).eq('id', p.id);
+    if (error) { el.checked = !val; return toast(traduire(error)); }
+    p.en_stock = val; toast(val ? 'Remis en stock' : 'Marqué comme épuisé');
+  }
+  if (el.dataset.action === 'prix') {
+    const prix = parseInt(chiffres(el.value), 10);
+    if (!prix) { el.value = fcfa(p.prix_fcfa); return toast('Entrez un prix en chiffres'); }
+    const { error } = await sb.from('produits').update({ prix_fcfa: prix }).eq('id', p.id);
+    if (error) { el.value = fcfa(p.prix_fcfa); return toast(traduire(error)); }
+    p.prix_fcfa = prix; el.value = fcfa(prix);
+    const c = el.parentElement; c.classList.add('enregistre'); setTimeout(() => c.classList.remove('enregistre'), 1200);
+    toast('Prix enregistré');
+  }
+});
+$('liste-produits').addEventListener('keydown', e => { if (e.target.dataset.action === 'prix' && e.key === 'Enter') e.target.blur(); });
+
+/* ---------- Fenêtre produit ---------- */
+brancherDepot($('p-photo'), $('p-photo-img'), $('depot-produit'), f => fichierProduit = f);
+$('p-prix').addEventListener('input', e => { const d = chiffres(e.target.value); e.target.value = d ? fcfa(d) : ''; });
+
+function ouvrirProduit(p = null) {
+  produitEdite = p; fichierProduit = null; $('p-photo').value = '';
+  $('p-titre').textContent = p ? 'Modifier le produit' : 'Nouveau produit';
+  $('btn-produit').textContent = p ? 'Enregistrer' : 'Ajouter le produit';
+  $('p-nom').value = p?.nom || ''; $('p-desc').value = p?.description || '';
+  $('p-prix').value = p ? fcfa(p.prix_fcfa) : '';
+  const img = $('p-photo-img');
+  if (p?.photo_url) { img.src = p.photo_url; img.hidden = false; $('depot-produit').classList.add('rempli'); }
+  else { img.hidden = true; $('depot-produit').classList.remove('rempli'); }
+  montrerErreur('p-erreur', '');
+  const v = $('voile-produit'); v.hidden = false; requestAnimationFrame(() => v.classList.add('ouvert'));
+  document.body.style.overflow = 'hidden';
+}
+function fermerProduit() {
+  const v = $('voile-produit'); v.classList.remove('ouvert');
+  setTimeout(() => { v.hidden = true; document.body.style.overflow = ''; }, 250);
+}
+$('btn-ajouter').onclick = () => ouvrirProduit();
+$('btn-ajouter-2').onclick = () => ouvrirProduit();
+$('btn-fermer').onclick = fermerProduit;
+$('voile-produit').addEventListener('click', e => { if (e.target.id === 'voile-produit') fermerProduit(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && !$('voile-produit').hidden) fermerProduit(); });
+
+$('form-produit').addEventListener('submit', async e => {
+  e.preventDefault(); montrerErreur('p-erreur', '');
+  const nom = $('p-nom').value.trim(), description = $('p-desc').value.trim() || null;
+  const prix = parseInt(chiffres($('p-prix').value), 10);
+  if (!produitEdite && !fichierProduit) return montrerErreur('p-erreur', "Ajoutez une photo : c'est ce que vos clients regardent en premier.");
+  if (nom.length < 2) return montrerErreur('p-erreur', "Donnez un nom au produit.");
+  if (!prix) return montrerErreur('p-erreur', "Entrez le prix en chiffres.");
+  const btn = $('btn-produit'), texte = btn.textContent;
+  occupe(btn, true, 'Enregistrement…');
+  try {
+    let photo_url = produitEdite?.photo_url || null;
+    if (fichierProduit) photo_url = await envoyerPhoto(fichierProduit, 'produit');
+    const donnees = { nom, description, prix_fcfa: prix, photo_url };
+    if (produitEdite) {
+      const { data, error } = await sb.from('produits').update(donnees).eq('id', produitEdite.id).select().single();
+      if (error) throw error;
+      if (fichierProduit && produitEdite.photo_url) supprimerPhoto(produitEdite.photo_url);
+      Object.assign(produitEdite, data); toast('Produit enregistré');
+    } else {
+      const { data, error } = await sb.from('produits').insert({ ...donnees, en_stock: true, boutique_id: boutique.id }).select().single();
+      if (error) throw error;
+      produits.push(data); produits.sort((a, b) => a.nom.localeCompare(b.nom, 'fr')); toast('Produit ajouté');
+    }
+    dessinerProduits(); fermerProduit();
+  } catch (err) { montrerErreur('p-erreur', traduire(err)); }
+  finally { occupe(btn, false, texte); }
+});
+
+/* ---------- Démarrage ---------- */
+(async () => {
+  if (new URLSearchParams(location.search).has('inscription')) choisirOnglet('inscription'); else choisirOnglet('connexion');
+  sb.auth.onAuthStateChange(evt => { if (evt === 'PASSWORD_RECOVERY') afficher('recup'); });
+  const { data: { session } } = await sb.auth.getSession();
+  if (estRecuperation && session) { utilisateur = session.user; afficher('recup'); return; }
+  if (session) entrer(session.user); else afficher('auth');
+})();
+</script>
+</body>
+</html>
